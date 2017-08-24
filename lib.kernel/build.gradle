@@ -49,5 +49,7 @@ dependencies {
     compile 'gun0912.ted:tedpermission:2.0.0'
     compile 'uk.co.chrisjenx:calligraphy:2.3.0'
     compile "com.andkulikov:transitionseverywhere:1.7.5"
+
+    compile 'com.otaliastudios:autocomplete:1.0.1'
     testCompile 'junit:junit:4.12'
 }
