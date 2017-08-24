@@ -1,0 +1,7 @@
+<resources>
+    <string name="gcn_app_id">AIzaSyB_rLLV5HqlRHMNmKdEH7NuTJfkEzuci_Q</string>
+    <string name="gcm_sender_id">155452042625</string>
+    <string name="analytics_tracking_id">UA-80518523-2</string>
+    <string name="app_name">Lib.kernel</string>
+    <string name="app_google_api_key">AIzaSyCngs6CIRrUjx-o_RAXkEG1JNJT_OwCYXI</string>
+</resources>

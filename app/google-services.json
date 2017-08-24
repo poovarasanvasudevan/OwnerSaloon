@@ -1,0 +1,51 @@
+{
+  "project_info": {
+    "project_number": "155452042625",
+    "project_id": "centering-star-173805"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:155452042625:android:1054fbb7ef30d98b",
+        "android_client_info": {
+          "package_name": "com.woolgather.mysaloon"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "155452042625-1ljpq2m528n8hqe4q8l906g6753omt28.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "155452042625-otea7u76o2c000gp1utpd6r20ukampkq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.woolgather.mysaloon",
+            "certificate_hash": "d3ad1737bce0e6314484c21f9fc38d009ee9062b"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfmq-wqdsvUNChMI4jdqHYuAUSTYIRflY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-80518523-2"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    <android.support.v7.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:id="@+id/selfAddress"
+            android:layout_marginLeft="10dp"
+            android:textAppearance="@style/TextStyle"
+            android:layout_gravity="center_vertical"
+            android:textSize="16dp"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:layout_height="wrap_content"/>
+
+    <View style="@style/Divider" />
+
+    <LinearLayout android:layout_width="wrap_content"
+                  android:orientation="horizontal"
+                  android:layout_height="wrap_content">
+
+        <com.woolgather.lib.kernel.widget.RippleIconButton
+                android:layout_width="40dp"
+                android:id="@+id/direction"
+                android:background="@android:color/white"
+                android:layout_height="40dp"/>
+
+        <com.woolgather.lib.kernel.widget.RippleIconButton
+                android:layout_width="40dp"
+                android:id="@+id/information"
+                android:background="@android:color/white"
+                android:layout_height="40dp"/>
+
+        <com.woolgather.lib.kernel.widget.RippleIconButton
+                android:layout_width="40dp"
+                android:id="@+id/places"
+                android:background="@android:color/white"
+                android:layout_height="40dp"/>
+
+        <com.woolgather.lib.kernel.widget.RippleIconButton
+                android:layout_width="40dp"
+                android:background="@android:color/white"
+                android:id="@+id/help"
+                android:layout_height="40dp"/>
+    </LinearLayout>
+</LinearLayout>

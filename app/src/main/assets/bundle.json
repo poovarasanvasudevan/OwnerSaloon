@@ -1,0 +1,17 @@
+{
+    "version": "1.0.0",
+    "bundles": [
+        {
+            "uri": "lib.kernel",
+            "pkg": "com.woolgather.lib.kernel"
+        },
+        {
+            "uri": "main",
+            "pkg": "com.woolgather.app.main",
+            "rules":{
+                "signin":".SignIn",
+                "map":".WebMapActivity"
+            }
+        }
+    ]
+}
