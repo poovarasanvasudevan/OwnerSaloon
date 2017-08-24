@@ -78,6 +78,7 @@ public class MainActivity extends BaseActivity implements
     private ImageButton searchButton;
     private ImageButton myLocationButton;
     private EditText    searchBox;
+    private Location currentLocation;
 
     @Override
     protected void onStart() {
@@ -165,7 +166,25 @@ public class MainActivity extends BaseActivity implements
         myLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                location();
+                TedPermission.with(getApplicationContext())
+                        .setPermissionListener(new PermissionListener() {
+                            @Override
+                            public void onPermissionGranted() {
+                                if(currentLocation !=null) {
+                                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()), googleMap.getCameraPosition().zoom));
+                                }
+                            }
+
+                            @Override
+                            public void onPermissionDenied(ArrayList<String> deniedPermissions) {
+
+                            }
+                        })
+                        .setDeniedTitle("Permission denied")
+                        .setGotoSettingButtonText("Go to Settings")
+                        .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                        .setPermissions(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        .check();
             }
         });
 
@@ -218,6 +237,7 @@ public class MainActivity extends BaseActivity implements
             this.googleMap.getUiSettings().setZoomControlsEnabled(true);
             this.googleMap.getUiSettings().setMapToolbarEnabled(false);
             this.googleMap.setBuildingsEnabled(true);
+            this.googleMap.getUiSettings().setMyLocationButtonEnabled(true);
             this.googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 @Override
                 public View getInfoWindow(Marker marker) {
@@ -296,9 +316,11 @@ public class MainActivity extends BaseActivity implements
         LogUtils.d("I am No 6");
         final LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
+        currentLocation = location;
+
         if (markerAdded == true) {
             myMarker.setPosition(latLng);
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, googleMap.getCameraPosition().zoom));
+         //   googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, googleMap.getCameraPosition().zoom));
         } else {
             Ion.with(getApplicationContext())
                     .load(photoUrl)
