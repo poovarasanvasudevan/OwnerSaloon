@@ -5,6 +5,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -53,7 +54,7 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
     protected void onStart() {
         super.onStart();
 
-        if(mGoogleApiClient !=null && !mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient != null && !mGoogleApiClient.isConnected()) {
             mGoogleApiClient.connect();
         }
     }
@@ -61,7 +62,7 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
     @Override
     protected void onStop() {
         super.onStop();
-        if(mGoogleApiClient !=null && mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
     }
@@ -73,7 +74,6 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
     }
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,10 +81,20 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
         //Base.initFont();
 
         setContentView(R.layout.activity_sign_in);
+
+        if( getIntent().getBooleanExtra("EXIT", false)){
+            finish();
+            return; // add this to prevent from doing unnecessary stuffs
+        }
         initView();
 
-        mGoogleApiClient = Base.getGoogleApiClient(this,this);
-
+        mGoogleApiClient = Base.getGoogleApiClient(this, this);
+        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+        if (opr.isDone()) {
+            Log.d("TAG", "Got cached sign-in");
+            GoogleSignInResult result = opr.get();
+            handleSignInResult(result);
+        }
         gplusSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -166,9 +176,9 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
 
             GoogleSignInAccount acct = result.getSignInAccount();
 
-            Prefs.with(getApplicationContext()).write("display_name",acct.getDisplayName());
-            Prefs.with(getApplicationContext()).write("email",acct.getEmail());
-            Prefs.with(getApplicationContext()).write("profilePic",acct.getPhotoUrl().toString());
+            Prefs.with(getApplicationContext()).write("display_name", acct.getDisplayName());
+            Prefs.with(getApplicationContext()).write("email", acct.getEmail());
+            Prefs.with(getApplicationContext()).write("profilePic", acct.getPhotoUrl().toString());
 
 
             Ion.with(getApplicationContext())
@@ -196,9 +206,9 @@ public class SignInActivity extends BaseActivity implements GoogleApiClient.OnCo
             new android.os.Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Small.openUri("main",SignInActivity.this);
+                    Small.openUri("main", SignInActivity.this);
                 }
-            },4000);
+            }, 4000);
         } else {
             // Signed out, show unauthenticated UI.
             ToastUtils.showLong("Failed");

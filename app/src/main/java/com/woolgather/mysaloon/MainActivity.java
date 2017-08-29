@@ -17,8 +17,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onComplete() {
+
                 Small.openUri("main/signin", MainActivity.this);
                 finish();
+
             }
         });
     }

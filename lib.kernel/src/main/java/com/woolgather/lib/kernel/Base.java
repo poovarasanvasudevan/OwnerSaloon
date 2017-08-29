@@ -6,6 +6,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,6 +17,10 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.media.ThumbnailUtils;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.widget.AppCompatTextView;
+import android.widget.LinearLayout;
+
+import com.blankj.utilcode.util.ToastUtils;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
@@ -76,6 +81,27 @@ public class Base {
 
         return output;
     }
+
+    public static void showToast(Context context, CharSequence charSequence) {
+        LinearLayout              linearLayout   = new LinearLayout(context);
+        LinearLayout.LayoutParams linLayoutParam = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+
+        linearLayout.setLayoutParams(linLayoutParam);
+
+        AppCompatTextView         appCompatTextView = new AppCompatTextView(context);
+        LinearLayout.LayoutParams linLayoutParam2   = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        linLayoutParam2.setMargins(16, 16, 16, 16);
+        appCompatTextView.setLayoutParams(linLayoutParam2);
+
+        appCompatTextView.setTextColor(Color.WHITE);
+        linearLayout.setBackgroundColor(Color.parseColor("#999999"));
+        linearLayout.addView(appCompatTextView);
+
+
+        appCompatTextView.setText(charSequence);
+        ToastUtils.showCustomLongSafe(linearLayout);
+    }
+
 
     public static void initFont() {
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()

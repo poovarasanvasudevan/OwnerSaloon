@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -36,6 +37,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
@@ -46,10 +48,13 @@ import com.koushikdutta.ion.Ion;
 import com.mikepenz.community_material_typeface_library.CommunityMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.rey.material.widget.ImageButton;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.woolgather.lib.kernel.Base;
 import com.woolgather.lib.kernel.activity.BaseActivity;
 import com.woolgather.lib.kernel.core.Prefs;
 import com.woolgather.lib.kernel.widget.RippleIconButton;
+
+import net.wequick.small.Small;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,9 +65,9 @@ public class MainActivity extends BaseActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
-    private AppBarLayout         appbar;
-    private SupportMapFragment   map;
-    private Toolbar              toolbar;
+    private AppBarLayout       appbar;
+    private SupportMapFragment map;
+    private Toolbar            toolbar;
 
     String displayName = "";
     String photoUrl    = "";
@@ -75,10 +80,16 @@ public class MainActivity extends BaseActivity implements
 
     Boolean markerAdded = false;
     Marker myMarker;
-    private ImageButton searchButton;
-    private ImageButton myLocationButton;
-    private EditText    searchBox;
-    private Location currentLocation;
+    private ImageButton          searchButton;
+    private ImageButton          myLocationButton;
+    private EditText             searchBox;
+    private Location             currentLocation;
+    private View                 leftDivider;
+    private View                 rightDivider;
+    private RippleIconButton     zoomPlus;
+    private RippleIconButton     zoomMinus;
+    private SlidingUpPanelLayout slidingLayout;
+    private RelativeLayout       searchPanel;
 
     @Override
     protected void onStart() {
@@ -102,6 +113,18 @@ public class MainActivity extends BaseActivity implements
     protected void onDestroy() {
         super.onDestroy();
 
+    }
+
+
+    @Override
+    public void onBackPressed() {
+
+        Intent exitIntent = Small.getIntentOfUri("main/signin", this);
+        exitIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        exitIntent.putExtra("EXIT", true);
+        startActivity(exitIntent);
+        finish();
+        super.onBackPressed();
     }
 
     PermissionListener locationPermissionListener = new PermissionListener() {
@@ -170,8 +193,8 @@ public class MainActivity extends BaseActivity implements
                         .setPermissionListener(new PermissionListener() {
                             @Override
                             public void onPermissionGranted() {
-                                if(currentLocation !=null) {
-                                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()), googleMap.getCameraPosition().zoom));
+                                if (currentLocation != null) {
+                                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), googleMap.getCameraPosition().zoom));
                                 }
                             }
 
@@ -188,6 +211,67 @@ public class MainActivity extends BaseActivity implements
             }
         });
 
+        zoomPlus.setImageIcon(
+                CommunityMaterial.Icon.cmd_plus,
+                16,
+                Color.BLACK
+        );
+
+        zoomMinus.setImageIcon(
+                CommunityMaterial.Icon.cmd_minus,
+                16,
+                Color.BLACK
+        );
+
+        zoomPlus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (googleMap != null) {
+                    float zoomLevel = googleMap.getCameraPosition().zoom;
+
+                    if (zoomLevel >= googleMap.getMaxZoomLevel()) {
+                        ToastUtils.showShortSafe("Maximum Zoom Level Reached");
+                    } else {
+                        googleMap.animateCamera(CameraUpdateFactory.zoomTo(zoomLevel + 1));
+                    }
+                }
+            }
+        });
+
+
+        zoomMinus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (googleMap != null) {
+                    float zoomLevel = googleMap.getCameraPosition().zoom;
+
+                    if (zoomLevel <= googleMap.getMinZoomLevel()) {
+                        ToastUtils.showShortSafe("Minimum Zoom Level Reached");
+                    } else {
+                        googleMap.animateCamera(CameraUpdateFactory.zoomTo(zoomLevel - 1));
+                    }
+                }
+            }
+        });
+
+        slidingLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+
+                LogUtils.d("Slide At : " + String.valueOf(slideOffset));
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+
+                if(newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                    searchPanel.setVisibility(View.GONE);
+                }
+                if(newState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
+                    searchPanel.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     private void initView() {
@@ -199,10 +283,15 @@ public class MainActivity extends BaseActivity implements
         searchBox = (EditText) findViewById(R.id.searchBox);
 
 
-
         myLocationButton.setImageDrawable(
-                new IconicsDrawable(this,CommunityMaterial.Icon.cmd_crosshairs_gps).sizeDp(18).color(Color.BLACK)
+                new IconicsDrawable(this, CommunityMaterial.Icon.cmd_crosshairs_gps).sizeDp(18).color(Color.BLACK)
         );
+        leftDivider = (View) findViewById(R.id.leftDivider);
+        rightDivider = (View) findViewById(R.id.rightDivider);
+        zoomPlus = (RippleIconButton) findViewById(R.id.zoomPlus);
+        zoomMinus = (RippleIconButton) findViewById(R.id.zoomMinus);
+        slidingLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        searchPanel = (RelativeLayout) findViewById(R.id.searchPanel);
     }
 
     public void location() {
@@ -233,11 +322,9 @@ public class MainActivity extends BaseActivity implements
                 Log.e("TAG", "Style parsing failed.");
 
             }
-            this.googleMap.getUiSettings().setZoomGesturesEnabled(true);
-            this.googleMap.getUiSettings().setZoomControlsEnabled(true);
+
             this.googleMap.getUiSettings().setMapToolbarEnabled(false);
             this.googleMap.setBuildingsEnabled(true);
-            this.googleMap.getUiSettings().setMyLocationButtonEnabled(true);
             this.googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                 @Override
                 public View getInfoWindow(Marker marker) {
@@ -248,20 +335,20 @@ public class MainActivity extends BaseActivity implements
                 public View getInfoContents(Marker marker) {
                     View view = getLayoutInflater().inflate(R.layout.map_popup_self, null);
 
-                    ((RippleIconButton)view.findViewById(R.id.direction)).setImageIcon(
-                            CommunityMaterial.Icon.cmd_directions,24, ContextCompat.getColor(getApplicationContext(),R.color.material_indigo_500)
+                    ((RippleIconButton) view.findViewById(R.id.direction)).setImageIcon(
+                            CommunityMaterial.Icon.cmd_directions, 24, ContextCompat.getColor(getApplicationContext(), R.color.material_indigo_500)
                     );
 
-                    ((RippleIconButton)view.findViewById(R.id.information)).setImageIcon(
-                            CommunityMaterial.Icon.cmd_information,24,ContextCompat.getColor(getApplicationContext(),R.color.material_green_500)
+                    ((RippleIconButton) view.findViewById(R.id.information)).setImageIcon(
+                            CommunityMaterial.Icon.cmd_information, 24, ContextCompat.getColor(getApplicationContext(), R.color.material_green_500)
                     );
 
-                    ((RippleIconButton)view.findViewById(R.id.places)).setImageIcon(
-                            CommunityMaterial.Icon.cmd_store,24,ContextCompat.getColor(getApplicationContext(),R.color.material_red_500)
+                    ((RippleIconButton) view.findViewById(R.id.places)).setImageIcon(
+                            CommunityMaterial.Icon.cmd_store, 24, ContextCompat.getColor(getApplicationContext(), R.color.material_red_500)
                     );
 
-                    ((RippleIconButton)view.findViewById(R.id.help)).setImageIcon(
-                            CommunityMaterial.Icon.cmd_help,24,ContextCompat.getColor(getApplicationContext(),R.color.material_orange_500)
+                    ((RippleIconButton) view.findViewById(R.id.help)).setImageIcon(
+                            CommunityMaterial.Icon.cmd_help, 24, ContextCompat.getColor(getApplicationContext(), R.color.material_orange_500)
                     );
 
                     Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
@@ -320,7 +407,7 @@ public class MainActivity extends BaseActivity implements
 
         if (markerAdded == true) {
             myMarker.setPosition(latLng);
-         //   googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, googleMap.getCameraPosition().zoom));
+            //   googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, googleMap.getCameraPosition().zoom));
         } else {
             Ion.with(getApplicationContext())
                     .load(photoUrl)
@@ -341,7 +428,7 @@ public class MainActivity extends BaseActivity implements
 
                         }
                     });
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17.0f));
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16.0f));
 
         }
 
